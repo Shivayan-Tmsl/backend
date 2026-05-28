@@ -15,7 +15,7 @@ dotenv.config();
 
 app.use(
     cors({
-        origin: process.env.CLIENT_URL || "*",
+        origin: "https://expensetracker-jcdko7o4a-shivas-projects-c12cd162.vercel.app",
         methods: ["GET", "POST", "PUT", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
