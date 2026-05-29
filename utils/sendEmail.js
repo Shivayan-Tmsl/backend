@@ -4,20 +4,19 @@ import dns from "dns";
 dns.setDefaultResultOrder("ipv4first");
 
 const transporter = nodemailer.createTransport({
-  // Hardcoded standard IPv4 address for smtp.gmail.com
-  host: "74.125.200.108", 
-  port: 465,
-  secure: true,
+  // We can switch back to the domain name since Port 587 handles IPv4 routing cleanly
+  host: "smtp.gmail.com", 
+  port: 587,
+  secure: false, // Must be false for port 587
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    pass: process.env.EMAIL_PASS, // Ensure this is the 16-character string without spaces
   },
   connectionTimeout: 10000,
   tls: {
+    // This forces the secure TLS upgrade and handles cloud network certificates
     rejectUnauthorized: false,
-    // CRITICAL: Because we are using an IP address instead of a domain name, 
-    // we must tell TLS to expect 'smtp.gmail.com' or the handshake will fail SSL validation.
-    servername: 'smtp.gmail.com' 
+    minVersion: "TLSv1.2"
   }
 });
 
