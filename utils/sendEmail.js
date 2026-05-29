@@ -5,10 +5,19 @@ import nodemailer from 'nodemailer';
 // Step 2: Create a transporter object
 // This transporter will be responsible for communicating with the email service.
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // Use the 'gmail' service
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+
   auth: {
-    user: process.env.EMAIL_USER, // Your Gmail address
-    pass: process.env.EMAIL_PASS, // Your Gmail App Password (CRUCIAL - see note below)
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+
+  connectionTimeout: 10000,
+
+  tls: {
+    rejectUnauthorized: false,
   },
 });
 
@@ -25,8 +34,8 @@ export const sendEmail = async (to, subject, text) => {
     // Step 4: Send the email
     await transporter.sendMail(mailOptions);
   } catch (error) {
-    console.error('Error sending email:', error);
-    throw new Error('Failed to send email');
+    console.error('Error sending email:', error.message);
+    return false;
   }
 };
 
