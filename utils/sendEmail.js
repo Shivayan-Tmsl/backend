@@ -4,19 +4,16 @@ import dns from "dns";
 dns.setDefaultResultOrder("ipv4first");
 
 const transporter = nodemailer.createTransport({
-  // We can switch back to the domain name since Port 587 handles IPv4 routing cleanly
-  host: "smtp.gmail.com", 
-  port: 587,
-  secure: false, // Must be false for port 587
+  // Google's alternate relay server that accepts connections over non-standard restrictions
+  host: "smtp-relay.gmail.com", 
+  port: 25, // Sometimes cloud providers leave port 25 open for relays, or try 443 if supported
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS, // Ensure this is the 16-character string without spaces
+    pass: process.env.EMAIL_PASS,
   },
-  connectionTimeout: 10000,
   tls: {
-    // This forces the secure TLS upgrade and handles cloud network certificates
-    rejectUnauthorized: false,
-    minVersion: "TLSv1.2"
+    rejectUnauthorized: false
   }
 });
 
