@@ -1,20 +1,25 @@
 import nodemailer from 'nodemailer';
-import { TransactionalEmailsApi, SendSmtpEmail } from '@getbrevo/brevo';
+import { TransactionalEmailsApi } from '@getbrevo/brevo';
 
-// Initialize the Brevo API client correctly for ES Modules
+// Initialize the API client
 const apiInstance = new TransactionalEmailsApi();
-apiInstance.setApiKey(0, process.env.BREVO_API_KEY); // '0' represents the default API Key slot
+
+// Set the API Key using the required method structure
+apiInstance.setApiKey(0, process.env.BREVO_API_KEY); 
 
 export const sendEmail = async (to, subject, text) => {
   try {
-    const sendSmtpEmail = new SendSmtpEmail();
+    // Just create a plain JavaScript object matching the Brevo API schema
+    const emailData = {
+      subject: subject,
+      textContent: text,
+      sender: { name: "Budget Tracker", email: process.env.EMAIL_USER },
+      to: [{ email: to }]
+    };
 
-    sendSmtpEmail.subject = subject;
-    sendSmtpEmail.textContent = text;
-    sendSmtpEmail.sender = { name: "Budget Tracker", email: process.env.EMAIL_USER }; 
-    sendSmtpEmail.to = [{ email: to }];
-
-    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    // Pass the plain object straight into the function
+    await apiInstance.sendTransacEmail(emailData);
+    
     console.log("Email sent successfully to:", to);
     return true;
   } catch (error) {
