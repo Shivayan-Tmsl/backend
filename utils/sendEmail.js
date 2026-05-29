@@ -1,9 +1,8 @@
-// Step 1: Import the nodemailer module
 import nodemailer from 'nodemailer';
+import dns from "dns";
 
+dns.setDefaultResultOrder("ipv4first");
 
-// Step 2: Create a transporter object
-// This transporter will be responsible for communicating with the email service.
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
@@ -19,11 +18,13 @@ const transporter = nodemailer.createTransport({
   tls: {
     rejectUnauthorized: false,
   },
+
+  family: 4,
 });
 
 export const sendEmail = async (to, subject, text) => {
   try {
-    // Step 3: Define the email options
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to,
@@ -31,10 +32,16 @@ export const sendEmail = async (to, subject, text) => {
       text
     };
 
-    // Step 4: Send the email
     await transporter.sendMail(mailOptions);
+
+    console.log("Email sent successfully");
+
+    return true;
+
   } catch (error) {
+
     console.error('Error sending email:', error.message);
+
     return false;
   }
 };
