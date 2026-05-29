@@ -1,17 +1,16 @@
 import nodemailer from 'nodemailer';
-import * as Brevo from '@getbrevo/brevo';
+import { TransactionalEmailsApi, SendSmtpEmail } from '@getbrevo/brevo';
 
-// Initialize the Brevo API client
-const apiInstance = new Brevo.TransactionalEmailsApi();
-apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
+// Initialize the Brevo API client correctly for ES Modules
+const apiInstance = new TransactionalEmailsApi();
+apiInstance.setApiKey(0, process.env.BREVO_API_KEY); // '0' represents the default API Key slot
 
 export const sendEmail = async (to, subject, text) => {
   try {
-    const sendSmtpEmail = new Brevo.SendSmtpEmail();
+    const sendSmtpEmail = new SendSmtpEmail();
 
     sendSmtpEmail.subject = subject;
     sendSmtpEmail.textContent = text;
-    // You can use your own dedicated Gmail address as the sender here!
     sendSmtpEmail.sender = { name: "Budget Tracker", email: process.env.EMAIL_USER }; 
     sendSmtpEmail.to = [{ email: to }];
 
