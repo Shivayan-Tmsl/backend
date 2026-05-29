@@ -4,22 +4,21 @@ import dns from "dns";
 dns.setDefaultResultOrder("ipv4first");
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
+  // Hardcoded standard IPv4 address for smtp.gmail.com
+  host: "74.125.200.108", 
   port: 465,
   secure: true,
-
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-
   connectionTimeout: 10000,
-
   tls: {
     rejectUnauthorized: false,
-  },
-
-  family: 4,
+    // CRITICAL: Because we are using an IP address instead of a domain name, 
+    // we must tell TLS to expect 'smtp.gmail.com' or the handshake will fail SSL validation.
+    servername: 'smtp.gmail.com' 
+  }
 });
 
 export const sendEmail = async (to, subject, text) => {
