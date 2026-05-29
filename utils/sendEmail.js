@@ -1,42 +1,25 @@
 import nodemailer from 'nodemailer';
-import dns from "dns";
+import * as Brevo from '@getbrevo/brevo';
 
-dns.setDefaultResultOrder("ipv4first");
-
-const transporter = nodemailer.createTransport({
-  // Google's alternate relay server that accepts connections over non-standard restrictions
-  host: "smtp-relay.gmail.com", 
-  port: 25, // Sometimes cloud providers leave port 25 open for relays, or try 443 if supported
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false
-  }
-});
+// Initialize the Brevo API client
+const apiInstance = new Brevo.TransactionalEmailsApi();
+apiInstance.setApiKey(Brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
 
 export const sendEmail = async (to, subject, text) => {
   try {
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to,
-      subject,
-      text
-    };
+    sendSmtpEmail.subject = subject;
+    sendSmtpEmail.textContent = text;
+    // You can use your own dedicated Gmail address as the sender here!
+    sendSmtpEmail.sender = { name: "Budget Tracker", email: process.env.EMAIL_USER }; 
+    sendSmtpEmail.to = [{ email: to }];
 
-    await transporter.sendMail(mailOptions);
-
-    console.log("Email sent successfully");
-
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log("Email sent successfully to:", to);
     return true;
-
   } catch (error) {
-
-    console.error('Error sending email:', error.message);
-
+    console.error('Error sending email via Brevo:', error.message);
     return false;
   }
 };
